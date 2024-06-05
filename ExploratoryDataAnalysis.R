@@ -75,3 +75,40 @@ print(association_symptom3)
 
 print("Association between Disease and Symptom 4:")
 print(association_symptom4)
+
+# Load required libraries
+library(ggplot2)
+library(gridExtra)
+
+# Univariate Plots
+# Histogram of disease frequency
+ggplot(your_data, aes(x = Disease)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Disease Frequency", x = "Disease", y = "Frequency")
+
+# Bar plot of symptom frequencies
+symptom_frequencies <- stack(table(unlist(your_data[,2:5])))
+ggplot(symptom_frequencies, aes(x = ind, y = values, fill = ind)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Bar Plot of Symptom Frequencies", x = "Symptom", y = "Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Multivariate Plots
+# Pairwise scatterplot of symptoms
+symptoms <- your_data[,2:5]
+colnames(symptoms) <- c("Symptom 1", "Symptom 2", "Symptom 3", "Symptom 4")
+pairs(symptoms)
+
+# Boxplot of disease vs. symptom 1
+ggplot(your_data, aes(x = Disease, y = Symptom_1)) +
+  geom_boxplot(fill = "skyblue", color = "black") +
+  labs(title = "Boxplot of Disease vs. Symptom 1", x = "Disease", y = "Symptom 1")
+
+# Scatterplot of symptom 1 vs. symptom 2 colored by disease
+ggplot(your_data, aes(x = Symptom_1, y = Symptom_2, color = Disease)) +
+  geom_point() +
+  labs(title = "Scatterplot of Symptom 1 vs. Symptom 2 Colored by Disease", x = "Symptom 1", y = "Symptom 2")
+
+# Combine plots into a single display
+grid.arrange(grobs = list(hist_plot, bar_plot, pairwise_plot, box_plot, scatter_plot),
+             ncol = 2)
