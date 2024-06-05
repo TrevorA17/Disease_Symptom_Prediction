@@ -16,7 +16,6 @@ head(your_data)
 # View the dataset in a separate viewer window
 View(your_data)
 
-# Assuming your dataset is named "your_data"
 
 # Measures of Frequency
 # Frequency of each disease
