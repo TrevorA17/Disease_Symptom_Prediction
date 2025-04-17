@@ -1,0 +1,244 @@
+---
+title: "Disease Symptoms Prediction"
+author: "Trevor Okinda"
+date: "2024"
+output:
+  github_document: 
+    toc: yes
+    toc_depth: 4
+    fig_width: 6
+    fig_height: 4
+    df_print: default
+editor_options:
+  chunk_output_type: console
+---
+
+# Student Details
+
+|                                              |     |
+|----------------------------------------------|-----|
+| **Student ID Number**                        | 134780 |
+| **Student Name**                             | Trevor Okinda |
+| **BBIT 4.2 Group**                           | C |
+| **Project Name**                             | Disease Symptoms Prediction |
+
+# Setup Chunk
+
+**Note:** the following KnitR options have been set as the global defaults: <BR> `knitr::opts_chunk$set(echo = TRUE, warning = FALSE, eval = TRUE, collapse = FALSE, tidy = TRUE)`.
+
+More KnitR options are documented here <https://bookdown.org/yihui/rmarkdown-cookbook/chunk-options.html> and here <https://yihui.org/knitr/options/>.
+
+```{r setup, include=FALSE}
+library(formatR)
+knitr::opts_chunk$set(
+  warning = FALSE,
+  collapse = FALSE
+)
+```
+
+### Source: 
+
+The dataset that was used can be downloaded here: *\<https://www.kaggle.com/datasets/itachi9604/disease-symptom-description-dataset?select=dataset.csv\>*
+
+### Reference:
+
+*\<itachi9604. (n.d.). Disease Symptom Description Dataset. Kaggle. Retrieved April 17, 2025, from https://www.kaggle.com/datasets/itachi9604/disease-symptom-description-dataset\>\
+Refer to the APA 7th edition manual for rules on how to cite datasets: <https://apastyle.apa.org/style-grammar-guidelines/references/examples/data-set-references>*
+
+# Exploratory Data Analysis
+## Load dataset
+```{r Load dataset}
+# Load dataset
+your_data <- read.csv("dataset.csv", colClasses = c(
+  Disease = "factor",
+  Symptom_1 = "factor",
+  Symptom_2 = "factor",
+  Symptom_3 = "factor",
+  Symptom_4 = "factor"
+))
+
+# Display the structure of the dataset
+str(your_data)
+
+# View the first few rows of the dataset
+head(your_data)
+
+# View the dataset in a separate viewer window
+View(your_data)
+```
+
+## Measures of Frequency
+```{r MOF}
+# Measures of Frequency
+# Frequency of each disease
+disease_frequency <- table(your_data$Disease)
+
+# Frequency of each symptom
+symptom1_frequency <- table(your_data$Symptom_1)
+symptom2_frequency <- table(your_data$Symptom_2)
+symptom3_frequency <- table(your_data$Symptom_3)
+symptom4_frequency <- table(your_data$Symptom_4)
+
+```
+
+## Measures of Central Tendency
+```{r MOCT}
+# Measures of Central Tendency
+# No central tendency measures are applicable for disease or symptom variables
+
+# Measures of Distribution
+# No distribution measures are applicable for disease or symptom variables
+```
+
+## Measures of Relationship
+```{r MOR}
+# Measures of Relationship
+# Association between disease and symptom 1
+association_symptom1 <- table(your_data$Disease, your_data$Symptom_1)
+
+# Association between disease and symptom 2
+association_symptom2 <- table(your_data$Disease, your_data$Symptom_2)
+
+# Association between disease and symptom 3
+association_symptom3 <- table(your_data$Disease, your_data$Symptom_3)
+
+# Association between disease and symptom 4
+association_symptom4 <- table(your_data$Disease, your_data$Symptom_4)
+
+# Output Measures of Frequency
+print("Frequency of each disease:")
+print(disease_frequency)
+
+print("Frequency of Symptom 1:")
+print(symptom1_frequency)
+
+print("Frequency of Symptom 2:")
+print(symptom2_frequency)
+
+print("Frequency of Symptom 3:")
+print(symptom3_frequency)
+
+print("Frequency of Symptom 4:")
+print(symptom4_frequency)
+
+# Output Measures of Relationship
+print("Association between Disease and Symptom 1:")
+print(association_symptom1)
+
+print("Association between Disease and Symptom 2:")
+print(association_symptom2)
+
+print("Association between Disease and Symptom 3:")
+print(association_symptom3)
+
+print("Association between Disease and Symptom 4:")
+print(association_symptom4)
+
+```
+
+## Plots
+```{r Plots}
+# Load required libraries
+library(ggplot2)
+library(gridExtra)
+
+# Univariate Plots
+# Histogram of disease frequency
+hist_plot <- ggplot(your_data, aes(x = Disease)) +
+  geom_bar(fill = "skyblue", color = "black") +
+  labs(title = "Histogram of Disease Frequency", x = "Disease", y = "Frequency")
+
+# Bar plot of symptom frequencies
+symptom_frequencies <- stack(table(unlist(your_data[,2:5])))
+bar_plot <- ggplot(symptom_frequencies, aes(x = ind, y = values, fill = ind)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Bar Plot of Symptom Frequencies", x = "Symptom", y = "Frequency") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Multivariate Plots
+# Pairwise scatterplot of symptoms
+symptoms <- your_data[,2:5]
+colnames(symptoms) <- c("Symptom 1", "Symptom 2", "Symptom 3", "Symptom 4")
+pairwise_plot <- recordPlot({
+  pairs(symptoms)
+})
+
+# Boxplot of disease vs. symptom 1
+box_plot <- ggplot(your_data, aes(x = Disease, y = Symptom_1)) +
+  geom_boxplot(fill = "skyblue", color = "black") +
+  labs(title = "Boxplot of Disease vs. Symptom 1", x = "Disease", y = "Symptom 1")
+
+# Scatterplot of symptom 1 vs. symptom 2 colored by disease
+scatter_plot <- ggplot(your_data, aes(x = Symptom_1, y = Symptom_2, color = Disease)) +
+  geom_point() +
+  labs(title = "Scatterplot of Symptom 1 vs. Symptom 2 Colored by Disease", x = "Symptom 1", y = "Symptom 2")
+
+# Combine plots into a single display
+grid.arrange(grobs = list(hist_plot, bar_plot, box_plot, scatter_plot), ncol = 2)
+```
+
+# Preprocessing and Data Transformation
+## Missing Values
+```{r Missing Values}
+# Check for missing values in the entire dataset
+missing_values <- sum(is.na(your_data))
+
+# Check for missing values in each column
+missing_in_columns <- sapply(your_data, function(x) sum(is.na(x)))
+
+# Check for rows with missing values
+rows_with_missing <- which(apply(your_data, 1, function(x) any(is.na(x))))
+
+# Print the results
+print(paste("Total missing values in the dataset:", missing_values))
+print("Missing values in each column:")
+print(missing_in_columns)
+print("Rows with missing values:")
+print(rows_with_missing)
+```
+
+# Model Training
+## Data Splitting
+```{r Data Splitting}
+# Set seed for reproducibility
+set.seed(123)
+
+# Define the proportion of data for training (e.g., 70%)
+train_proportion <- 0.7
+
+# Generate random indices for splitting the data
+train_indices <- sample(1:nrow(your_data), size = floor(train_proportion * nrow(your_data)))
+
+# Create training and testing datasets
+training_data <- your_data[train_indices, ]
+testing_data <- your_data[-train_indices, ]
+
+dim(training_data)
+dim(testing_data)
+```
+
+## Cross-validation
+```{r Cross-validation}
+# Load required library
+library(caret)
+
+# Install and load required packages
+library(rpart)
+
+
+# Define number of folds for cross-validation (e.g., 5-fold cross-validation)
+num_folds <- 5
+
+# Create cross-validation folds
+cv_folds <- createFolds(your_data$Disease, k = num_folds, list = TRUE, returnTrain = FALSE)
+
+# Perform cross-validation
+
+  
+# Train your model using train_data and evaluate on test_data
+# For example, train a decision tree model
+model <- rpart(Disease ~ ., data = training_data, method = "class")
+predictions <- predict(model, testing_data, type = "class")
+# Evaluate model performance
+accuracy <- mean(predictions == test_data$Disease)
+print(paste("Accuracy for fold", i, ":", accuracy))
